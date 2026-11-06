@@ -1,0 +1,613 @@
+{
+  "version": 1,
+  "activeId": "49cdec39-12ca-4bcc-8377-f79d587adc8a",
+  "projects": [
+    {
+      "id": "49cdec39-12ca-4bcc-8377-f79d587adc8a",
+      "name": "Projet de démonstration — 12 casques PCVR",
+      "currency": "EUR",
+      "settings": {
+        "sessionRate": 0.65,
+        "fillRate": 0.85,
+        "vat": 0.2,
+        "chargerCapacity": 2
+      },
+      "experiences": [
+        {
+          "id": "xp-demo",
+          "name": "Expérience de démonstration",
+          "capacity": 12,
+          "duration": 35,
+          "interval": 35,
+          "ticketPrice": 35,
+          "operatorsRatio": 0.6,
+          "mode": "PCVR",
+          "compatibleHeadsets": [
+            "Pico 4 Ultra Enterprise"
+          ]
+        }
+      ],
+      "locations": [
+        {
+          "id": "loc-demo",
+          "name": "Lieu de démonstration",
+          "startDate": "2026-12-01",
+          "endDate": "2026-12-31",
+          "week": [
+            {
+              "open": true,
+              "start": "10:00",
+              "end": "18:00"
+            },
+            {
+              "open": true,
+              "start": "10:00",
+              "end": "18:00"
+            },
+            {
+              "open": true,
+              "start": "10:00",
+              "end": "18:00"
+            },
+            {
+              "open": true,
+              "start": "10:00",
+              "end": "18:00"
+            },
+            {
+              "open": true,
+              "start": "10:00",
+              "end": "18:00"
+            },
+            {
+              "open": true,
+              "start": "10:00",
+              "end": "18:00"
+            },
+            {
+              "open": false,
+              "start": "10:00",
+              "end": "18:00"
+            }
+          ],
+          "exceptions": [],
+          "rooms": [
+            {
+              "id": "room-demo",
+              "name": "Salle immersive",
+              "setups": [
+                {
+                  "id": "setup-demo",
+                  "name": "Setup A",
+                  "experienceId": "xp-demo",
+                  "mode": "PCVR",
+                  "count": 1,
+                  "capacity": 12,
+                  "headsets": 12,
+                  "headsetModel": "Pico 4 Ultra Entreprise - casque VR",
+                  "ticketPrice": 35
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "staff": {
+        "hourlyCost": 23,
+        "operatorsPerSetup": 0.6,
+        "reception": 1,
+        "beforeMinutes": 60,
+        "afterMinutes": 60,
+        "pauseThresholdHours": 6,
+        "pauseMinutes": 60,
+        "pauseCoverage": true,
+        "extraStaff": []
+      },
+      "finance": {
+        "opex": [
+          {
+            "name": "Loyer",
+            "amount": 3500,
+            "frequency": "monthly"
+          },
+          {
+            "name": "Électricité",
+            "amount": 450,
+            "frequency": "monthly"
+          },
+          {
+            "name": "Assurance",
+            "amount": 120,
+            "frequency": "monthly"
+          }
+        ],
+        "ancillary": [],
+        "feeMode": "none",
+        "feeRate": 0,
+        "feeFixed": 0,
+        "variablePerVisitor": 0,
+        "variablePerSession": 0,
+        "variableRate": 0
+      },
+      "capex": {
+        "margin": 0.3,
+        "custom": []
+      }
+    }
+  ],
+  "scenarios": [],
+  "catalog": [
+    {
+      "id": "clavier",
+      "name": "Clavier",
+      "category": "Informatique",
+      "price": 40.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/-/en/Logitech-Business-Keyboard-Discreet-Splash-Resistant/dp/B00EJ3RMDM/ref=sr_1_1?crid=2S3R2BOHV5NPZ&dib=eyJ2IjoiMSJ9.nQxpan3SAxXOqOoSicG9napAdcY8J1D_bpmMoUK0tFTRY5LYwZx33JBK2gRp5fewgZypXyDQIQV5fS8Tn73mHYYHjKtDFsRXBSgQGByqg0ISb2SXoT2qmHvED3dD2Md-kz8A322wMGCMW1pO471-fhhRoKAsc2keXQ5IsmX3z_wvpLPEJiDQ1472rjjrP1F12_gPOmH-thtw_Mc9LoQfj6TlTppmfSeJdAfXdgb5FwsBJdz2BgF22ypXhoPLfRaj5c1EM4ptHvqcRPb1nvntkwEKYoXDxLfBtXknXbFIXPY.bPoQ6B6IqTTh1zb5BgcH7XgmerC7-ZZBFonSVNKXlp8&dib_tag=se&keywords=clavier+logitech&qid=1782401777&refinements=p_123%3A213704%7C395698&rnid=91049112031&sprefix=clavier+logitec%2Caps%2C187&sr=8-1",
+      "notes": ""
+    },
+    {
+      "id": "souris",
+      "name": "Souris",
+      "category": "Informatique",
+      "price": 22.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/-/en/Razer-DeathAdder-Essential-Ergonomic-Programmable/dp/B092R5MCB3/ref=sr_1_1?crid=BBVQJY3T0LTE&dib=eyJ2IjoiMSJ9.XbX3w31DbkSK84Yqjd9qDwJpri4KXtYrenTUw_6kvCJ6vDPmbpuQ35ga9zcJ_3ou_KskSpef3b8Rz6QZ17fHpid1w3LrNS0taicSMSg8aoV1h8wuXTibdLvayT2BoMnPFgvQlZXp879nW45uaylH-95cl7jHQOFijSyenJgDMblj5U5rwKojuvAv8onfZRIeAjf3ye1lxU3fEWrdzIJIjmCfcBmUohZVG200c5I1gb030JIZ1ug9HtxGMsweHyzWvE0Vv7-xcSmTY_z4yJPO9m4rsYEZtxMthxcrXVtBczc.g0NSwXrkNsEpu2S3SLe8IpI7EFBgvanwVHpnlY2mucY&dib_tag=se&keywords=souris%2Bfilaire&qid=1782401731&refinements=p_123%3A213704%7C220854%7C248671%7C395698%2Cp_n_feature_six_browse-bin%3A27199001031&rnid=91049112031&sprefix=souris%2Bfilair%2Caps%2C154&sr=8-1&th=1",
+      "notes": ""
+    },
+    {
+      "id": "pc-nuc-spec-d-ryzen-5-7430u-max-4-3ghz-6c-12t-mieux-que-5500u-5675",
+      "name": "PC Nuc* - (Spec ΑΜD Ryzen 5 7430U(Max 4.3GHz,6C/12T, Mieux Que 5500U/5675U),16Go DDR4 RAM/512Go SSD,Mini Ordinateur de Bureau Étude,WiFi 6/BT 5.2/4K Triple Display/VESA Supporté)",
+      "category": "Informatique",
+      "price": 350.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/-/en/dp/B0CQT8NMPM?ref=fed_asin_title&th=1",
+      "notes": ""
+    },
+    {
+      "id": "ecran-salle-technique",
+      "name": "Ecran Salle technique*",
+      "category": "Informatique",
+      "price": 75.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/Minifire-1920x1080-Ultra-Fin-Inclinaison-MF24X3AC/dp/B0D12TSP52/ref=sr_1_6?crid=4J6N34C0CL9D&dib=eyJ2IjoiMSJ9.fB538PVvSnzspEhEqS89uAHG4uczfbZ0TPrmDDtOwbGK1uyl22SmrQwKtx2s4qRldR5v5nb6RqckWWuTDumclMBPHN6c49SmVxVdgg521-53OWnv1qs-Wl1ov2DLblhaK70TeQE4xJr-bniSM-9DHQe_XWmUpwm0ktgTA5yLTPBKJlmgyJrR8sUinGGToGZWDyZdAB5cRXLhlv5s5tEigHTdVe9U_v3kEAGzmFLNkwgiIekaAj75nh43qFW3P_MsjiZjmdxMDnTO_ionZ71DNfKfLzMPNTljpzxdGQMMpZQ.YDOlECtYGZklxN5vNJhjtAaR6aGe89UTW4ldnZOy9_I&dib_tag=se&keywords=ecran%2Bpc&qid=1772706506&sprefix=ecran%2Caps%2C259&sr=8-6&th=1",
+      "notes": ""
+    },
+    {
+      "id": "kvm-hdmi-8-port",
+      "name": "KVM HDMI 8 Port",
+      "category": "Informatique",
+      "price": 150.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/Displayport-Simulation-Commutateur-P%C3%A9riph%C3%A9riques-T%C3%A9l%C3%A9commande/dp/B0FXFZHJ6C/ref=sr_1_1_sspa?adgrpid=69107496677&dib=eyJ2IjoiMSJ9.RVWKI6Zy9eqDqhA0HbvgI1G6w_ATxbPYzS_dsLGI5CbMAv3NgtR458drmpiZW4beRpF9RNLdHflAqdaUwkIn-bTgY4eiDX6M3Fh540OqrzrpVlFE8YGsyFEZ0UwF0bCbk4zgKEVUqUGqX8-k61ce_iXq_CFJuVGnsYlKv5vSqfB3PE8N2Fm0GBZfsPWDZCOX96C5rMMFmMaGUCYBGI9mB9a9XcCy1XDYT2limP9GU81-S9xegrOtL12-AZKwQPt_VqocNhTiwO1KNRM2y207fuWG5iI8jJtjyQe_UGXJ7eU.8-RdGQUig3HwN5FoH1-joJ1zDt8aOkmeawPEx9L-K3U&dib_tag=se&hvadid=799299776606&hvdev=c&hvexpln=0&hvlocphy=9197145&hvnetw=g&hvocijid=11659664523649986471--&hvqmt=e&hvrand=11659664523649986471&hvtargid=kwd-336412958124&hydadcr=7969_2433459&keywords=kvm%2B8%2Bport%2Bswitch&mcid=40f64956ba1e36648e5e0b9e83b4d8fd&qid=1782395779&sr=8-1-spons&aref=2J0bCsuRkW&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1",
+      "notes": ""
+    },
+    {
+      "id": "routeur-er605v2",
+      "name": "Routeur ER605v2",
+      "category": "Réseau",
+      "price": 69.95,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.ldlc.com/fiche/PB00465624.html",
+      "notes": ""
+    },
+    {
+      "id": "controller-oc200",
+      "name": "Controller OC200",
+      "category": "Réseau",
+      "price": 119.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.ldlc.com/fiche/PB00256490.html?gad_source=1&gad_campaignid=23490404139&gbraid=0AAAABClChtaLVqrYkGl7_GcJ0trayjL8m&gclid=Cj0KCQjwo_PRBhDNARIsAEcVALXDlYBbyqHflJrAP3fqbJXH-hRgt7mRRsgrEgM5JM86ySvvZylchScaAiJwEALw_wcB",
+      "notes": ""
+    },
+    {
+      "id": "switch-sg3428xmp",
+      "name": "Switch SG3428XMP",
+      "category": "Réseau",
+      "price": 505.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/-/en/TP-Link-TL-SG3428XMP-Managed-Switch-Gigabit/dp/B08P7PSDBT/ref=sr_1_1_mod_primary_new?adgrpid=120900398137&dib=eyJ2IjoiMSJ9.gOAATbN3hUYWCzKLZHWA5QmTwxWdlwop_IEv-GNd7Q4yiMNejR--IwcvMr-CujGoxdFyeZvdpNOEca_UGBhVM46fzIqDeZ3Zsm4HGYMp5yINkIHh8cNjrxGYqTZz-K9IlsJlRaHNvOGe0ymUnFTdwUkp-L5rmBrs18FmPJYoFXZlzL8HLVrz62i67f0AmI0ckjAgt9_ZufjL0bVIvUaNMhIK-0i9CfneIMNArrTcOYjLVVCXxczT1CyfHwJPfW7Z23HMzCUfNryxMTfleDGoN0rBVVSUYkg7B6685Mpao5s.MGzoVfL12yyyuGzpHt6DzZMuhAYCXRYOKGdpLpVqSGA&dib_tag=se&hvadid=601527550477&hvdev=c&hvexpln=0&hvlocphy=9195693&hvnetw=g&hvocijid=13437673779708593033--&hvqmt=e&hvrand=13437673779708593033&hvtargid=kwd-1155685897572&hydadcr=14354_2288392&keywords=tl-sg3428xmp&mcid=cc45095dc31f3071ba577d38bd0c233f&qid=1782399137&sbo=RZvfv%2F%2FHxDF%2BO5021pAnSA%3D%3D&sr=8-1",
+      "notes": ""
+    },
+    {
+      "id": "point-eap772",
+      "name": "Point EAP772",
+      "category": "Réseau",
+      "price": 209.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.ldlc.com/fiche/PB00652942.html?gad_source=1&gad_campaignid=23500158694&gbraid=0AAAABClChtaWczbfIVgxYBaJj8sQXnGDo&gclid=Cj0KCQjwo_PRBhDNARIsAEcVALXiCEHAh5BgF1VcpSgwL3JvWwV3_NYIi1t_GK6PoI1ek9ZRzGlPgnUaArOaEALw_wcB",
+      "notes": ""
+    },
+    {
+      "id": "tablette-android",
+      "name": "Tablette Android",
+      "category": "Accessoires",
+      "price": 360.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/Samsung-Uniquement-Tablette-Batterie-International/dp/B0FMFRFNWG/ref=sr_1_1?__mk_fr_FR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=2FFYKSYSHQ2K1&dib=eyJ2IjoiMSJ9.piHWZfkNrz0liPUEIHGPVI77eSUlyG0vAM1BA1J0BQvc8G4rcavT3wKbtAseO9fWDaAlHrKUSPBgu3FOYPHHjOabUC1-KFd3eU6xFwGVgev5fTqlpi--PjkUO9yRn8Yb_5d-3qlFcngaJ65xroi9QCkcwa9LsMV_-HOQNOgVMyWvQ1qyvjEatchL0FpHlk4PovErECUAQm5M4aA0IfA6oYnqttTH0N-wWpppJBu4qrqBTMeotsPM3rvQ3pihZtNBgen8C0aUzdc4ZC6f1Y-LmTw04a45q5Nxx2tbmgyl_jo.Io-PcNh4QkcOUFFWAsI7MGYfQtAIupeTXSzaw4JWgew&dib_tag=se&keywords=Samsung+Galaxy+Tab+S10&qid=1783090626&s=computers&sprefix=samsung+galaxy+tab+s10%2Ccomputers%2C117&sr=1-1",
+      "notes": ""
+    },
+    {
+      "id": "grippe-tablette",
+      "name": "Grippe Tablette",
+      "category": "Accessoires",
+      "price": 25.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/gp/aw/d/B0CDX1T1G2/?_encoding=UTF8&pd_rd_plhdr=t&aaxitk=cdf2b005d3a671193d20d10caefd993b&hsa_cr_id=0&qid=1772632066&sr=1-1-1ee1b2e4-01d1-4cd0-b737-4c27ebfc8105&aref=VGwlRRKpGz&ref_=sbx__sbtcd2_asin_0_title&pd_rd_w=T220P&content-id=amzn1.sym.102f5b8c-9a92-422c-bc8f-013d3ccd4947%3Aamzn1.sym.102f5b8c-9a92-422c-bc8f-013d3ccd4947&pf_rd_p=102f5b8c-9a92-422c-bc8f-013d3ccd4947&pf_rd_r=KE1EYZNSV7RFMRM4WVP1&pd_rd_wg=HBTbp&pd_rd_r=ff9cd6ad-ebfe-48e2-80e4-1518c161dc42&th=1",
+      "notes": ""
+    },
+    {
+      "id": "fixation-mural-tablette",
+      "name": "Fixation Mural tablette",
+      "category": "Accessoires",
+      "price": 20.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.amazon.fr/Lucrave-Tablette-Aluminium-Rotation-Compatible/dp/B0CZNM53PS/ref=sr_1_1_sspa?adgrpid=1353499751337701&dib=eyJ2IjoiMSJ9.b53Bx0HoRusyyiPZkZEYwXL2e696PbEFo1IxgznJIEhU_VW4ZDcf5iAPRyKCxInP7MJ0pUuPitK3nFQeM8226QLPr_OoDbynnuSt5KDCMSXtm0Y-t0549VqBiFChB-l48Qb7uxJ3O3Jg31TiHZy80V3wQmJNIYRU4DS1IxXUuAzzDnTfb1IRRLThtCTNYUtqK4dZNXn0EgFhGKUi5XkcT5WfVeAUnqog9MFBFlNPYzl20Nj03c4DTFdrVHcOspL9IPhwap-E9j1MmGayhr7lSZtCuuRVRfYytngjoxbNO6I.DU4lQ1ov5YS-hxEoF1qoM6Sihm9HiDy7ianOJKWsbpA&dib_tag=se&hvadid=84593993481256&hvbmt=bp&hvdev=c&hvlocphy=126875&hvnetw=o&hvqmt=p&hvtargid=kwd-84594263492903%3Aloc-66&hydadcr=23804_1879970&keywords=support+mural+tablette+samsung&mcid=7e7a0e4295cd361faa2f99e6c6878bda&msclkid=08eac53d702014e18265ac954aa05143&qid=1772632709&sr=8-1-spons&aref=JquWNVqfGj&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1",
+      "notes": ""
+    },
+    {
+      "id": "pico-4-ultra-entreprise-casque-vr",
+      "name": "Pico 4 Ultra Entreprise - casque VR",
+      "category": "Casque VR",
+      "price": 860.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://matts-digital.com/fr/realite-virtuelle-pico/811-pico-4-ultra.html",
+      "notes": ""
+    },
+    {
+      "id": "strap-2-batteries-dock-de-charge-2-emplacement",
+      "name": "Strap + 2 Batteries + Dock de charge 2 emplacement",
+      "category": "Accessoires",
+      "price": 74.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.bobovr.com/fr/products/bobovr-p4-2",
+      "notes": ""
+    },
+    {
+      "id": "oreillaires-plastique-dur",
+      "name": "Oreillaires plastique dur",
+      "category": "Accessoires",
+      "price": null,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "fixation-oreillaires",
+      "name": "Fixation Oreillaires",
+      "category": "Accessoires",
+      "price": null,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "sticker-n-casque",
+      "name": "Sticker N° Casque",
+      "category": "Accessoires",
+      "price": null,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "forfait-cables-cablages-diverses-accessoires",
+      "name": "Forfait Cables - cablages diverses/accessoires",
+      "category": "Accessoires",
+      "price": 300.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "motorola-tlkr-t82-extreme-quad-talky-walky-oreillette",
+      "name": "Motorola TLKR T82 Extreme QUAD (talky Walky oreillette)",
+      "category": "Accessoires",
+      "price": 250.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE STANDALONE)",
+      "url": "https://www.onedirect.fr/motorola-tlkr-t82-extreme-quad?utm_term=&utm_campaign=PMax+%7C+Walkies+%7C+FR&utm_source=adwords&utm_medium=ppc&hsa_acc=3884060270&hsa_cam=21523487738&hsa_grp=&hsa_ad=&hsa_src=x&hsa_tgt=&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3&gad_source=1&gad_campaignid=21517309644&gbraid=0AAAAAD_rS3cnhNJHp_-OtSYHx_uWdbrUP&gclid=Cj0KCQiAubrJBhCbARIsAHIdxD8BU0btQ1npt3TVU1N_pD8QpB2PWVO1xmoEL5e8jJgmD41i5GJQMRIaAu-WEALw_wcB",
+      "notes": ""
+    },
+    {
+      "id": "pc-rtx-5070ti-32gb-ram-i7",
+      "name": "PC rtx 5070ti 32gb ram I7",
+      "category": "Informatique",
+      "price": 1980.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE PCVR)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "rack-37u-sur-roues-600x800x1800",
+      "name": "rack  37U sur roues 600x800x1800",
+      "category": "Accessoires",
+      "price": 397.5,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (BASE PCVR)",
+      "url": "https://www.baiebrassage.fr/37u-relaisrack-sur-roues-600x800x1798mm-lxpxh.html",
+      "notes": ""
+    },
+    {
+      "id": "lino-8000x990mm",
+      "name": "Lino 8000x990mm",
+      "category": "Fabrication",
+      "price": 280.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (SALLE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "panneaux-pvc-1mx1m",
+      "name": "Panneaux PVC 1mx1m",
+      "category": "Fabrication",
+      "price": 41.5,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (SALLE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "forfait-visserie-diverses-accessoires",
+      "name": "Forfait visserie - diverses/accessoires",
+      "category": "Fabrication",
+      "price": 100.0,
+      "status": "à vérifier",
+      "source": "Liste matos.xlsx / CAPEX (SALLE)",
+      "url": "",
+      "notes": ""
+    },
+    {
+      "id": "spare-battery",
+      "name": "Batterie spare",
+      "category": "Accessoires VR",
+      "price": null,
+      "status": "à compléter",
+      "source": "Règle de dimensionnement",
+      "url": ""
+    },
+    {
+      "id": "battery-charger",
+      "name": "Chargeur de batteries",
+      "category": "Accessoires VR",
+      "price": null,
+      "status": "à compléter",
+      "source": "Règle de dimensionnement",
+      "url": ""
+    },
+    {
+      "id": "vbms-pro",
+      "name": "VBMS Pro / Ultimate",
+      "category": "Licences",
+      "price": null,
+      "status": "à compléter",
+      "source": "Règle HTC",
+      "url": ""
+    },
+    {
+      "id": "pc-client",
+      "name": "PC client VR",
+      "category": "Informatique",
+      "price": 1980,
+      "status": "à vérifier",
+      "source": "CAPEX (BASE PCVR)",
+      "url": ""
+    },
+    {
+      "id": "pc-server",
+      "name": "PC serveur",
+      "category": "Informatique",
+      "price": 1980,
+      "status": "à vérifier",
+      "source": "Hypothèse PCVR à valider",
+      "url": ""
+    },
+    {
+      "id": "wifi-ap",
+      "name": "Point d’accès Wi-Fi",
+      "category": "Réseau",
+      "price": 209,
+      "status": "à vérifier",
+      "source": "EAP772 dans fichier fourni",
+      "url": ""
+    }
+  ],
+  "templates": {
+    "CAPEX (BASE STANDALONE)": [
+      {
+        "equipmentId": "clavier",
+        "qty": 1
+      },
+      {
+        "equipmentId": "souris",
+        "qty": 1
+      },
+      {
+        "equipmentId": "pc-nuc-spec-d-ryzen-5-7430u-max-4-3ghz-6c-12t-mieux-que-5500u-5675",
+        "qty": 1
+      },
+      {
+        "equipmentId": "ecran-salle-technique",
+        "qty": 1
+      },
+      {
+        "equipmentId": "kvm-hdmi-8-port",
+        "qty": 1
+      },
+      {
+        "equipmentId": "routeur-er605v2",
+        "qty": 1
+      },
+      {
+        "equipmentId": "controller-oc200",
+        "qty": 1
+      },
+      {
+        "equipmentId": "switch-sg3428xmp",
+        "qty": 1
+      },
+      {
+        "equipmentId": "point-eap772",
+        "qty": 1
+      },
+      {
+        "equipmentId": "tablette-android",
+        "qty": 1
+      },
+      {
+        "equipmentId": "grippe-tablette",
+        "qty": 1
+      },
+      {
+        "equipmentId": "fixation-mural-tablette",
+        "qty": 1
+      },
+      {
+        "equipmentId": "pico-4-ultra-entreprise-casque-vr",
+        "qty": 12
+      },
+      {
+        "equipmentId": "strap-2-batteries-dock-de-charge-2-emplacement",
+        "qty": 12
+      },
+      {
+        "equipmentId": "oreillaires-plastique-dur",
+        "qty": 24
+      },
+      {
+        "equipmentId": "fixation-oreillaires",
+        "qty": 24
+      },
+      {
+        "equipmentId": "sticker-n-casque",
+        "qty": 24
+      },
+      {
+        "equipmentId": "forfait-cables-cablages-diverses-accessoires",
+        "qty": 1
+      },
+      {
+        "equipmentId": "motorola-tlkr-t82-extreme-quad-talky-walky-oreillette",
+        "qty": 2
+      }
+    ],
+    "CAPEX (BASE PCVR)": [
+      {
+        "equipmentId": "clavier",
+        "qty": 1
+      },
+      {
+        "equipmentId": "souris",
+        "qty": 1
+      },
+      {
+        "equipmentId": "pc-rtx-5070ti-32gb-ram-i7",
+        "qty": 13
+      },
+      {
+        "equipmentId": "ecran-salle-technique",
+        "qty": 1
+      },
+      {
+        "equipmentId": "kvm-hdmi-8-port",
+        "qty": 1
+      },
+      {
+        "equipmentId": "routeur-er605v2",
+        "qty": 1
+      },
+      {
+        "equipmentId": "controller-oc200",
+        "qty": 1
+      },
+      {
+        "equipmentId": "switch-sg3428xmp",
+        "qty": 1
+      },
+      {
+        "equipmentId": "point-eap772",
+        "qty": 1
+      },
+      {
+        "equipmentId": "tablette-android",
+        "qty": 1
+      },
+      {
+        "equipmentId": "grippe-tablette",
+        "qty": 1
+      },
+      {
+        "equipmentId": "fixation-mural-tablette",
+        "qty": 1
+      },
+      {
+        "equipmentId": "pico-4-ultra-entreprise-casque-vr",
+        "qty": 12
+      },
+      {
+        "equipmentId": "strap-2-batteries-dock-de-charge-2-emplacement",
+        "qty": 12
+      },
+      {
+        "equipmentId": "oreillaires-plastique-dur",
+        "qty": 24
+      },
+      {
+        "equipmentId": "fixation-oreillaires",
+        "qty": 24
+      },
+      {
+        "equipmentId": "sticker-n-casque",
+        "qty": 24
+      },
+      {
+        "equipmentId": "forfait-cables-cablages-diverses-accessoires",
+        "qty": 1
+      },
+      {
+        "equipmentId": "motorola-tlkr-t82-extreme-quad-talky-walky-oreillette",
+        "qty": 2
+      },
+      {
+        "equipmentId": "rack-37u-sur-roues-600x800x1800",
+        "qty": 3
+      }
+    ],
+    "CAPEX (SALLE)": [
+      {
+        "equipmentId": "lino-8000x990mm",
+        "qty": 8
+      },
+      {
+        "equipmentId": "panneaux-pvc-1mx1m",
+        "qty": 32
+      },
+      {
+        "equipmentId": "forfait-visserie-diverses-accessoires",
+        "qty": 1
+      }
+    ]
+  },
+  "createdAt": "2026-11-06T15:30:23.834Z",
+  "updatedAt": "2026-11-06T15:36:16.244Z"
+}

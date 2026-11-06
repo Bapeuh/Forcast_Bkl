@@ -1,0 +1,15 @@
+{
+  "name": "backlight-forecast",
+  "version": "1.2.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "description": "Forecast local et modulaire pour exploitations immersives",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "dev": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
