@@ -1,0 +1,32 @@
+name: Forecast CI
+on:
+  push:
+    branches: [main, 'integration/**', 'feature/**', 'fix/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Verify no personal state tracked
+        shell: bash
+        run: |
+          if git ls-files | grep -E '(^|/)state\.json$|(^|/)backups/|(^|/)\.env$'; then
+            echo 'Sensitive production files are tracked' >&2; exit 1
+          fi
+      - name: JavaScript syntax
+        run: |
+          node --check server.mjs
+          node --check public/app.js
+      - name: Unit and HTTP smoke tests
+        run: npm test
