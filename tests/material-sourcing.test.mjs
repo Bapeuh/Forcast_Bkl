@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {estimateCapex} from '../core/forecast.mjs';
+const model=()=>({locations:[],capex:{margin:.3,custom:[{name:'Machine',qty:10,unitCost:100,category:'Informatique'}]},settings:{}});
+const get=(m)=>estimateCapex(m,[]);
+test('ancien projet : tout est acheté',()=>{const c=get(model());assert.equal(c.cost,1000);assert.equal(c.purchase,1000);assert.equal(c.totalCost,1000);assert.equal(c.items[0].buyQty,10)});
+test('achat 5, stock 3 et location 2 sans double comptage',()=>{const m=model();m.capex.overrides={Machine:{stockQty:3,rentQty:2,stockUnitCost:10,rentalUnitCost:20,rentalMonths:3}};const c=get(m),x=c.items[0];assert.equal(x.buyQty,5);assert.equal(c.purchase,500);assert.equal(c.stockUse,30);assert.equal(c.rental,120);assert.equal(c.totalCost,650);assert.equal(c.sale,928.57)});
+test('stock et location limités aux quantités requises',()=>{const m=model();m.capex.overrides={Machine:{qty:4,stockQty:3,rentQty:5,rentalUnitCost:5}};const x=get(m).items[0];assert.deepEqual([x.buyQty,x.stockQty,x.rentQty],[0,3,1])});
+test('location sans tarif = devis incomplet, pas coût zéro',()=>{const m=model();m.capex.overrides={Machine:{rentQty:2}};const c=get(m);assert.equal(c.items[0].total,null);assert.equal(c.sale,null);assert.equal(c.missing.length,1)});
+test('100 % stock sans coût usage ne déclenche pas un achat',()=>{const m=model();m.capex.overrides={Machine:{stockQty:10}};const c=get(m);assert.equal(c.purchase,0);assert.equal(c.totalCost,0);assert.equal(c.items[0].buyQty,0)});
+test('marge spécifique de vente sur prix final',()=>{const m=model();m.capex.overrides={Machine:{margin:.5,stockQty:2,stockUnitCost:50}};const c=get(m);assert.equal(c.totalCost,900);assert.equal(c.sale,1800)});

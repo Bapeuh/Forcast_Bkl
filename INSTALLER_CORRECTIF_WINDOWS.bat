@@ -1,7 +1,10 @@
 @echo off
-setlocal
 cd /d "%~dp0"
-echo Correctif V1.1 : fermez d'abord Forecast.
-echo Copiez les fichiers public\app.js, public\app.css, core\forecast.mjs et tests\forecast.test.mjs.
-echo Ne remplacez pas data\state.json. Sauvegardez ce dossier avant toute modification.
+echo =========================================
+echo Forecast V1.4 Alpha - correctif
+ echo Faire une copie de votre dossier data AVANT mise a jour.
+echo Installer le correctif en copiant les fichiers dans le dossier de V1.3.1.
+echo Ne JAMAIS remplacer data/state.json.
+echo Puis lancer DEMARRER_WINDOWS.bat dans le dossier mis a jour.
+echo =========================================
 pause

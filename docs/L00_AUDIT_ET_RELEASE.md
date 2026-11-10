@@ -1,24 +1,26 @@
-# L00 — Audit technique Forecast (9 novembre 2026)
+# L00 — Consolidation technique (9 novembre 2026)
 
-## État réel vérifié
-La branche `main` est en V1.2 alpha, commit `a88a45f398188a4b4c51b6c3c9793b59773def63`. La V2.2.4 existe dans l'archive locale `Forecast_V2_2_4_GitHub_pret.zip`, mais le code complet de cette version n'est pas encore présent sur GitHub.
+## Source et écarts
+- GitHub `main` vérifié : V1.2 alpha, commit `a88a45f398188a4b4c51b6c3c9793b59773def63` (6 novembre 2026).
+- Source d'intégration : `Forecast_V2_2_4_GitHub_pret.zip` fournie dans la conversation.
+- Ne jamais confondre les versions annoncées en archives et la branche `main` réellement publiée.
+- Les fichiers `data/state.json`, `data/backups/`, `.env` et les archives d'exploitation ne doivent pas être versionnés.
 
-## Sources et résultat des tests dans l'archive L00
-- 111 tests V2.2.4 initiaux réussis.
-- 9 nouveaux tests ajoutés : état local et sauvegardes, refus de fichier corrompu, restauration, contrôles HTTP, chargement des modules et export XLSX.
-- Total obtenu dans l'environnement de préparation : **120 tests réussis**.
-- Amélioration locale de `state.json` : sauvegarde de l'ancienne version avant remplacement, écriture atomique, refus d'écraser un état corrompu.
-- La source L00 complète et les scripts Windows sont distribués dans une archive distincte. **Les modifications du moteur ne seront effectives sur GitHub qu'après publication de cette archive sur la branche d'intégration.**
+## Modifications L00
+- Conservation de la V2.2.4 et de ses 111 tests unitaires existants.
+- Sécurisation de l'état : validation à l'ouverture, refus d'écraser un état corrompu, sauvegarde de la version précédente avant mise à jour/import/restauration, écritures temporaires atomiques.
+- Tests supplémentaires : sauvegarde, restauration, rejet état invalide, verrouillage chemin de backup, HTTP réel, chargement des modules, export Excel XLSX.
+- CI GitHub Actions Node 20/22 et vérification de l'absence de données de production suivies.
 
-## Contrôles de release
-1. Tests Node 20/22 sous GitHub Actions.
-2. Démarrage Windows et navigation manuelle.
-3. Sauvegarde, mise à jour, restauration et redémarrage.
-4. Génération du devis Renault PDF/Excel et inspection visuelle.
-5. Vérification que `data/state.json`, `data/backups/` et secrets ne sont pas versionnés.
-6. Fusion sur `main` seulement après intégration du code complet et recette.
+## Recette
+1. `npm test` ; tous les tests doivent réussir.
+2. `node --check server.mjs` et `node --check public/app.js`.
+3. Démarrer `DEMARRER_WINDOWS.bat`, ouvrir un projet de test.
+4. Sauvegarder, modifier, restaurer, redémarrer ; les anciennes données doivent être retrouvées.
+5. Générer le devis DEV-2026-001 en PDF et Excel ; comparer visuellement avec le modèle fourni.
+6. Contrôler le dépôt avant push (`git status`, `git diff --cached --name-only`), vérifier aucun `data/state.json`.
 
-## Restant hors L00
-- Editeur PDF à 6 colonnes : L01.
-- Tests de rendu visuel navigateur et Excel Windows non effectués.
-- Migration de tous les anciens formats historiques : couverture partielle ; continuer à documenter les versions.
+## Limitations / jalons suivants
+- Les 120 tests automatisés ne constituent pas une recette navigateur interactive Windows ; PDF multi-pages et qualité visuelle restent à valider dans L01.
+- Les migrations entre anciens schémas de projets sont conservées telles quelles. Un moteur de migration versionné et des tests couvrant toutes les archives restent à compléter.
+- La synchronisation des sources sur la branche GitHub d'intégration doit être confirmée avant toute fusion sur `main`.
