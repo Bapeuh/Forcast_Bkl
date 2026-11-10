@@ -1,0 +1,119 @@
+{
+  "experienceLibrary": [
+    {
+      "id": "fixture-0",
+      "name": "La Magie Opéra",
+      "sourceTitle": "La Magie Opéra",
+      "version": "8x8",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-1",
+      "name": "Silk Road Journey",
+      "sourceTitle": "Silk Road Journey",
+      "version": "7x8",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-2",
+      "name": "Lady Liberty",
+      "sourceTitle": "Lady Liberty",
+      "version": "8x6.5",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-3",
+      "name": "Ascenders",
+      "sourceTitle": "Ascenders",
+      "version": "2 zones",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-4",
+      "name": "Eclipse",
+      "sourceTitle": "Eclipse",
+      "version": "2 zones",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-5",
+      "name": "Icecube Protocol — 70 m²",
+      "sourceTitle": "Icecube Protocol",
+      "version": "70 m²",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-6",
+      "name": "Icecube Protocol — 77 m²",
+      "sourceTitle": "Icecube Protocol",
+      "version": "77 m²",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-7",
+      "name": "Toyland — 8×8 m",
+      "sourceTitle": "Toyland",
+      "version": "8×8 m",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-8",
+      "name": "Toyland — 10×10 m",
+      "sourceTitle": "Toyland",
+      "version": "10×10 m",
+      "capacity": 6,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-9",
+      "name": "Far Reach",
+      "sourceTitle": "Far Reach",
+      "version": "siège",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "oz-birdy-king-land-1-si-ge",
+      "name": "Birdy King Land",
+      "sourceTitle": "Birdy King Land",
+      "version": "siège",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-11",
+      "name": "Renault",
+      "sourceTitle": "Renault",
+      "version": "standard",
+      "capacity": 5,
+      "ticketPrice": 25
+    },
+    {
+      "id": "fixture-12",
+      "name": "Expérience de démonstration",
+      "sourceTitle": "Expérience de démonstration",
+      "version": "standard",
+      "capacity": 5,
+      "ticketPrice": 25
+    }
+  ],
+  "projects": [
+    {
+      "experiences": [
+        {
+          "name": "Birdy Kingland",
+          "libraryId": "oz-far-reach-1-si-ge",
+          "duration": 10
+        }
+      ]
+    }
+  ]
+}

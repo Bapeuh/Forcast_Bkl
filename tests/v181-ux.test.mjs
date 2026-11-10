@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const app=readFileSync(new URL('../public/app.js',import.meta.url),'utf8');
+test('Structure du projet : suppression du lieu, de la salle et du setup',()=>{for(const a of ['uxDeleteLocation','uxDeleteRoom','uxDeleteSetup']){assert.ok(app.includes("case'"+a+"'")); assert.ok(app.includes('`'+a+':${i}'));}});
+test('Suppressions hiérarchiques : confirmation et absence de suppression sur annulation',()=>{for(const a of ['uxDeleteLocation','uxDeleteRoom','uxDeleteSetup']){const line=app.split("case'"+a+"':")[1].split('break;}')[0]; assert.ok(line.includes('confirm('));assert.ok(line.includes('return;'));}});
+test('Anciennes commandes : confirmation aussi dans les formulaires détaillés',()=>{for(const a of ['deleteLocation','deleteRoom','deleteSetup'])assert.match(app,new RegExp("case'"+a+"':if\\(confirm"));});
+test('Le parcours guidé reste accessible depuis les réglages détaillés',()=>{assert.ok(app.includes("case'returnJourney':tab='journey'"));assert.ok(app.includes('Retour au parcours guidé'));});
+test('Les accords et le financement sont des pages distinctes',()=>{assert.ok(app.includes('function contractsPage()'));assert.ok(app.includes('function fundingPage()'));assert.ok(app.includes('contracts:contractsPage'));assert.ok(app.includes('funding:fundingPage'));const finance=app.split('function finance(){')[1].split('function shareDraftStatus')[0];assert.ok(!finance.includes('fundingPanel()'));assert.ok(!finance.includes('partnershipPanel()'));});
+test('Les expériences référencées ne peuvent pas être supprimées sans retirer leurs affectations',()=>{assert.ok(app.includes('Expérience utilisée par un setup'));});

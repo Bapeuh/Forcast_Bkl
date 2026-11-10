@@ -1,96 +1,58 @@
 @echo off
 setlocal EnableExtensions
 cd /d "%~dp0"
-echo =========================================================
-echo   BACKLIGHT FORECAST V1.2 - PUBLICATION GITHUB
- echo  Depot : Bapeuh/Forcast_Bkl
- echo  Branche : main
- echo =========================================================
-where git >nul 2>nul
-if errorlevel 1 (
- echo ERREUR : Git pour Windows est necessaire.
- echo https://git-scm.com/download/win
- pause
- exit /b 1
-)
-where node >nul 2>nul
-if errorlevel 1 (
- echo ERREUR : Node.js 20+ est necessaire pour lancer les tests.
- echo https://nodejs.org/
- pause
- exit /b 1
-)
-echo.
-echo [1/5] Execution des tests...
+set "REPO=https://github.com/Bapeuh/Forcast_Bkl.git"
+set "BRANCH=integration/l00-v2.2.4"
+set "TARGET=%TEMP%\Forcast_L00_%RANDOM%_%RANDOM%"
+echo Forecast Backlight L00 - Publication sur la branche d'integration
+where git >nul 2>nul || (echo Git pour Windows requis.& pause & exit /b 1)
+where node >nul 2>nul || (echo Node.js 20+ requis.& pause & exit /b 1)
 call npm test
+if errorlevel 1 (echo ECHEC tests - publication interrompue.& pause & exit /b 1)
+git clone "%REPO%" "%TARGET%"
+if errorlevel 1 (echo ECHEC clone.& pause & exit /b 1)
+cd /d "%TARGET%"
+git fetch origin "%BRANCH%" >nul 2>nul
 if errorlevel 1 (
- echo ERREUR : tests en echec. Publication interrompue.
- pause
- exit /b 1
+  git checkout -b "%BRANCH%" origin/main
+) else (
+  git checkout -b "%BRANCH%" "origin/%BRANCH%"
 )
-set "TARGET=%TEMP%\Forcast_Bkl_publish_%RANDOM%_%RANDOM%"
-echo.
-echo [2/5] Clonage du depot dans %TARGET%
-git clone --branch main --single-branch https://github.com/Bapeuh/Forcast_Bkl.git "%TARGET%"
-if errorlevel 1 (
- echo ERREUR : impossible de cloner. Verifier connexion/permissions.
- pause
- exit /b 1
-)
-echo.
-echo [3/5] Copie des fichiers de l'application (sans les donnees privees)...
-for %%D in (core public scripts tests docs) do (
- if exist "%~dp0%%D" (
-  robocopy "%~dp0%%D" "%TARGET%\%%D" /E /XF *.log /XD node_modules >nul
-  if errorlevel 8 goto :copyerror
+if errorlevel 1 (echo ECHEC branche.& pause & exit /b 1)
+cd /d "%~dp0"
+for %%D in (core public scripts tests docs assets .github) do (
+ if exist "%%D" (
+  robocopy "%%D" "%TARGET%\%%D" /E /XD node_modules .git __pycache__ /XF *.log >nul
+  if errorlevel 8 goto copy_error
  )
 )
-for %%F in (package.json server.mjs DEMARRER_WINDOWS.bat TESTER_WINDOWS.bat INSTALLER_CORRECTIF_WINDOWS.bat .gitignore README.md PUBLIER_GITHUB_WINDOWS.bat) do (
- if exist "%~dp0%%F" copy /Y "%~dp0%%F" "%TARGET%\%%F" >nul
-)
+for %%F in (package.json server.mjs DEMARRER_WINDOWS.bat TESTER_WINDOWS.bat INSTALLER_CORRECTIF_WINDOWS.bat PUBLIER_GITHUB_WINDOWS.bat .gitignore README.md CORRECTIF_V1_6_1.md) do if exist "%%F" copy /Y "%%F" "%TARGET%\%%F" >nul
+for %%F in (RELEASE_*.md) do copy /Y "%%F" "%TARGET%\%%F" >nul
 if not exist "%TARGET%\data" mkdir "%TARGET%\data"
-for %%F in (catalog.json state.example.json) do (
- if exist "%~dp0data\%%F" copy /Y "%~dp0data\%%F" "%TARGET%\data\%%F" >nul
-)
-if exist "%TARGET%\data\state.json" (
- echo ATTENTION : data/state.json est dans le depot local. Publication interrompue.
- pause
- exit /b 1
-)
+for %%F in (catalog.json state.example.json) do if exist "data\%%F" copy /Y "data\%%F" "%TARGET%\data\%%F" >nul
+if exist "%TARGET%\data\state.json" (echo ERREUR: donnees de production dans le depot!&pause&exit /b 1)
 cd /d "%TARGET%"
 git add --all
-for /f "delims=" %%I in ('git diff --cached --name-only') do echo     %%I
+if errorlevel 1 goto error
+for /f "delims=" %%S in ('git diff --cached --name-only') do (
+ echo %%S | findstr /I /R "state.json backups .env" >nul
+ if not errorlevel 1 (echo ERREUR : fichier sensible detecte : %%S& pause&exit /b 1)
+)
+git diff --cached --stat
 git diff --cached --quiet
-if not errorlevel 1 (
- echo Rien a publier : le depot semble deja a jour.
- pause
- exit /b 0
-)
-echo.
-echo [4/5] Creation du commit...
-git commit -m "release: Forecast Backlight V1.2 alpha validated"
-if errorlevel 1 (
- echo ERREUR : impossible de creer le commit.
- echo Configurer git user.name et git user.email si necessaire.
- pause
- exit /b 1
-)
-echo.
-echo [5/5] Publication sur main...
-git push origin main
-if errorlevel 1 (
- echo ERREUR : push refuse. Le depot local de travail reste dans : %TARGET%
- echo Verifier la connexion, l'authentification ou les changements distants.
- pause
- exit /b 1
-)
-echo.
-echo SUCCES : https://github.com/Bapeuh/Forcast_Bkl
- echo Commit :
-git log -1 --oneline
+if not errorlevel 1 (echo Aucun changement a publier.&pause&exit /b 0)
+set /p "CONFIRM=Publier sur %BRANCH% (jamais main) ? (O/N) : "
+if /I not "%CONFIRM%"=="O" (echo Annule.&pause&exit /b 0)
+git commit -m "chore(l00): consolidate V2.2.4 and protect state"
+if errorlevel 1 goto error
+git push -u origin "%BRANCH%"
+if errorlevel 1 goto error
+echo Publie sur https://github.com/Bapeuh/Forcast_Bkl/tree/%BRANCH%
+echo Creer ou mettre a jour une PR vers main apres les tests GitHub Actions.
 pause
 exit /b 0
-:copyerror
-echo ERREUR de copie des fichiers.
+:copy_error
+echo ECHEC copie des sources.
+:error
 pause
 exit /b 1

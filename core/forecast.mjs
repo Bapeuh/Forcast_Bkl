@@ -162,25 +162,73 @@ export function estimateCapex(model,catalog=[]){
  const merged=new Map();
  for(const x of raw){const key=x.id+'|'+x.name;if(merged.has(key)){merged.get(key).qty+=x.qty}else merged.set(key,{...x})}
  const overrides=model.capex?.overrides||{};
+ // Chaque ligne peut être répartie entre achat, stock et location.
+ // Les anciennes sauvegardes sans répartition restent intégralement en achat.
+ const margin=Math.min(.95,Math.max(0,num(model.capex?.margin,.30)));
  const items=[...merged.values()].map(x=>{
   const ov=overrides[x.id]||{};
-  const qty=Math.max(0,num(ov.qty,x.qty));
-  const unitCost=ov.unitCost===null?null:num(ov.unitCost,x.unitCost);
+  const qty=Math.max(0,Math.floor(num(ov.qty,x.qty)));
   const excluded=Boolean(ov.excluded);
-  return {...x,qty:excluded?0:qty,unitCost,excluded,originalQty:x.qty,total:unitCost===null?null:money((excluded?0:qty)*unitCost)};
+  const kept=excluded?0:qty;
+  const stockQty=Math.min(kept,Math.max(0,Math.floor(num(ov.stockQty,0))));
+  const rentQty=Math.min(kept-stockQty,Math.max(0,Math.floor(num(ov.rentQty,0))));
+  const buyQty=kept-stockQty-rentQty;
+  const unitCost=ov.unitCost===null?null:num(ov.unitCost,x.unitCost);
+  const purchaseTotal=buyQty===0?0:unitCost===null?null:money(buyQty*unitCost);
+  // Le stock déjà possédé ne génère aucune dépense d'achat.
+  // On peut toutefois lui imputer un coût d'utilisation forfaitaire par unité.
+  const stockUnitCost=Math.max(0,num(ov.stockUnitCost,0));
+  const stockUseTotal=money(stockQty*stockUnitCost);
+  const rentalUnitCost=ov.rentalUnitCost===''||ov.rentalUnitCost==null?null:Math.max(0,num(ov.rentalUnitCost));
+  const rentalMonths=Math.max(1,num(ov.rentalMonths,1));
+  const rentalTotal=rentQty===0?0:rentalUnitCost===null?null:money(rentQty*rentalUnitCost*rentalMonths);
+  const total=purchaseTotal===null||rentalTotal===null?null:money(purchaseTotal+stockUseTotal+rentalTotal);
+  const m=Math.min(.95,Math.max(0,num(ov.margin,margin)));
+  const sale=total===null?null:ov.sale!=null?num(ov.sale):money(total/(1-m));
+  return {...x,qty:kept,unitCost,originalQty:x.qty,excluded,buyQty,stockQty,rentQty,stockUnitCost,stockUseTotal,rentalUnitCost,rentalMonths,rentalTotal,purchaseTotal,total,margin:m,sale};
  });
- const cost=items.reduce((s,x)=>s+num(x.total),0);
- const missing=items.filter(x=>x.unitCost===null&&x.qty>0);
- const margin=num(model.capex?.margin,0.30);
- const saleLines=items.map(x=>{
-  const ov=overrides[x.id]||{};const m=num(ov.margin,margin);
-  const sale=x.unitCost===null?null:money(x.qty*x.unitCost/(1-m));
-  return {...x,margin:m,sale:ov.sale!=null?num(ov.sale):sale};
- });
- const sale=saleLines.some(x=>x.sale===null&&x.qty>0)?null:money(saleLines.reduce((s,x)=>s+num(x.sale),0));
- return {items:saleLines,cost:money(cost),sale,missing:missing.map(x=>x.name),devices,pc,servers,ap,sets,spare,chargers};
+ const missing=items.filter(x=>(x.buyQty>0&&x.unitCost===null)||(x.rentQty>0&&x.rentalUnitCost===null));
+ const purchase=money(items.reduce((s,x)=>s+num(x.purchaseTotal),0));
+ const rental=money(items.reduce((s,x)=>s+num(x.rentalTotal),0));
+ const stockUse=money(items.reduce((s,x)=>s+x.stockUseTotal,0));
+ const totalCost=money(purchase+rental+stockUse);
+ const sale=items.some(x=>x.sale===null&&x.qty>0)?null:money(items.reduce((s,x)=>s+num(x.sale),0));
+ return {items,cost:purchase,purchase,rental,stockUse,totalCost,sale,missing:missing.map(x=>x.name+(x.buyQty>0&&x.unitCost===null?' (achat)':' (location)')),devices,pc,servers,ap,sets,spare,chargers};
 }
-export function revenuesAndProfit(model,traffic,staff,capex){
+/** Budget de mission hors achat matériel. Valeurs HT ; zéro ≠ coût inconnu. */
+export function calculateDeployment(model){
+ const config=model.deployment||{};
+ const defaultMargin=Math.min(.95,Math.max(0,num(config.margin,model.capex?.margin??.30)));
+ const expense=(v)=>v===''||v===null||v===undefined?0:Math.max(0,num(v));
+ const items=[];
+ const phase=x=>['before','during','after'].includes(x)?x:'before';
+ const add=(id,name,stage,cost,price,breakdown={},owner='Backlight',sector=null)=>{
+  const margin=defaultMargin;
+  items.push({id,name,phase:phase(stage),cost:money(cost),sale:price===null?null:money(price),breakdown,owner,sector});
+ };
+ if(config.mode==='flat'){
+  const cost=expense(config.flatCost), margin=defaultMargin;
+  add('flat','Forfait de déploiement',config.flatPhase||'before',cost,config.flatSale!=null&&config.flatSale!==''?expense(config.flatSale):cost/(1-margin),{forfait:money(cost)},config.flatOwner);
+ }else{
+  for(const m of config.missions||[]){
+   const technicians=expense(m.technicians),days=expense(m.days),hoursDay=expense(m.hoursPerDay),labor=technicians*days*hoursDay*expense(m.hourlyCost);
+   const preparation=expense(m.preparationHours)*expense(m.preparationHourlyCost);
+   const travelers=expense(m.travelers),nights=expense(m.nights),mealDays=expense(m.mealDays);
+   const accommodation=travelers*nights*expense(m.hotelPerNight),meals=travelers*mealDays*expense(m.mealPerDay);
+   const transport=travelers*expense(m.transportPerPerson)+expense(m.localTransport)+expense(m.freight)+expense(m.customs)+expense(m.insurance)+expense(m.otherCost);
+   const cost=money(labor+preparation+accommodation+meals+transport);
+   const margin=Math.min(.95,Math.max(0,m.marginPercent==null?num(m.margin,defaultMargin):num(m.marginPercent)/100));
+   const sale=m.billable===false?0:(m.salePrice!==null&&m.salePrice!==undefined&&m.salePrice!==''?expense(m.salePrice):cost/(1-margin));
+   add(m.id||m.name,m.name||'Mission',m.phase,cost,sale,{mainOeuvre:money(labor),preparation:money(preparation),hotel:money(accommodation),repas:money(meals),transportEtLogistique:money(transport)},m.owner,m.sector||null);
+  }
+ }
+ const total=money(items.reduce((a,x)=>a+x.cost,0));
+ const byPhase=Object.fromEntries(['before','during','after'].map(ph=>[ph,money(items.filter(x=>x.phase===ph).reduce((a,x)=>a+x.cost,0))]));
+ const sale=money(items.reduce((a,x)=>a+x.sale,0));
+ return {mode:config.mode==='flat'?'flat':'detailed',items,total,byPhase,sale,marginAmount:money(sale-total)};
+}
+
+export function revenuesAndProfit(model,traffic,staff,capex,deployment=calculateDeployment(model)){
  const tax=Math.max(0,num(model.settings?.vat,0.20));const ticketHT=traffic.gross/(1+tax);
  const fc=model.finance||{},opex=fc.opex||[];
  const months=Math.max(1,new Set(traffic.monthly.map(x=>x.month)).size);
@@ -188,13 +236,91 @@ export function revenuesAndProfit(model,traffic,staff,capex){
  const variable=traffic.visitors*num(fc.variablePerVisitor)+traffic.played*num(fc.variablePerSession)+ticketHT*num(fc.variableRate);
  const ancillary=(fc.ancillary||[]).reduce((s,x)=>s+num(x.amount)*(x.frequency==='monthly'?months:1),0);
  const fee=fc.feeMode==='none'?0:traffic.visitors*num(fc.feeFixed)+ticketHT*num(fc.feeRate);
- const revenue=ticketHT+ancillary,expenses=fixed+variable+staff.cost+fee;
+ const revenue=ticketHT+ancillary,expenses=fixed+variable+staff.cost+fee+deployment.byPhase.during;
  const profit=revenue-expenses;
  const avgRevPerVisitor=traffic.visitors?revenue/traffic.visitors:((traffic.gross/Math.max(traffic.visitors,1))/(1+tax));
  const contrib=avgRevPerVisitor-num(fc.variablePerVisitor)-num(fc.variableRate)*(traffic.visitors?ticketHT/traffic.visitors:0)-num(fc.feeFixed);
- const breakeven=contrib>0?ceil((fixed+staff.cost)/contrib):null;
- const withCapex=profit-capex.cost;
- return {tax,ticketHT:money(ticketHT),ancillary:money(ancillary),revenue:money(revenue),fixed:money(fixed),variable:money(variable),fee:money(fee),expenses:money(expenses),profit:money(profit),withCapex:money(withCapex),breakeven,breakPerDay:traffic.days?breakeven/traffic.days:null,breakPerHour:traffic.openHours?breakeven/traffic.openHours:null,marginPerVisitor:money(contrib)};
+ const breakeven=contrib>0?ceil((fixed+staff.cost+deployment.byPhase.during)/contrib):null;
+ const withCapex=profit-capex.cost-deployment.byPhase.before-deployment.byPhase.after;
+ return {deploymentExpense:deployment.byPhase.during,deploymentOther:money(deployment.byPhase.before+deployment.byPhase.after),tax,ticketHT:money(ticketHT),ancillary:money(ancillary),revenue:money(revenue),fixed:money(fixed),variable:money(variable),fee:money(fee),expenses:money(expenses),profit:money(profit),withCapex:money(withCapex),breakeven,breakPerDay:traffic.days?breakeven/traffic.days:null,breakPerHour:traffic.openHours?breakeven/traffic.openHours:null,marginPerVisitor:money(contrib)};
 }
-export function fullForecast(model,catalog=[]){const traffic=forecastTraffic(model);const staff=staffCost(model);const capex=estimateCapex(model,catalog);const finance=revenuesAndProfit(model,traffic,staff,capex);return {traffic,staff,capex,finance,computedAt:new Date().toISOString()}}
+
+// V1.6 : échéancier financier et flux de trésorerie (HT simplifié).
+// Le modèle ne remplace ni un plan comptable ni un échéancier contractuel.
+export function addMonth(yyyyMm,offset){
+ const [year,month]=yyyyMm.split('-').map(Number);
+ if(!Number.isInteger(year)||!Number.isInteger(month)||month<1||month>12)throw new Error('Mois de départ invalide');
+ const index=year*12+month-1+offset;
+ return `${Math.floor(index/12)}-${String(((index%12)+12)%12+1).padStart(2,'0')}`;
+}
+export function financingSchedule(capex,settings={},startMonth='2026-01'){
+ const purchase=Math.max(0,num(capex.purchase,0));
+ const mode=['cash','installments','loan','lease'].includes(settings.mode)?settings.mode:'cash';
+ const requested=settings.amount==null?purchase:Math.max(0,num(settings.amount));
+ const amount=Math.min(purchase,requested);
+ const deposit=Math.min(amount,Math.max(0,num(settings.deposit,0)));
+ const borrowed=mode==='cash'?0:money(amount-deposit);
+ const term=mode==='cash'?0:Math.min(240,Math.max(1,Math.floor(num(settings.months,12))));
+ const annualRate=mode==='installments'?0:Math.max(0,num(settings.annualRatePercent,0))/100;
+ const monthlyRate=annualRate/12;
+ const buyout=mode==='lease'?Math.max(0,num(settings.buyout,0)):0;
+ // Mensualités constantes, avec arrondi final et solde restant exact.
+ const payment=borrowed<=0?0:monthlyRate===0?borrowed/term:borrowed*monthlyRate/(1-Math.pow(1+monthlyRate,-term));
+ let balance=borrowed;
+ const rows=[];
+ for(let i=0;i<term;i++){
+  const interest=money(balance*monthlyRate);
+  const principal=money(i===term-1?balance:Math.min(balance,Math.max(0,payment-interest)));
+  balance=money(Math.max(0,balance-principal));
+  const last=i===term-1?buyout:0;
+  rows.push({month:addMonth(startMonth,i),payment:money(principal+interest),principal,interest,buyout:last,remaining:balance});
+ }
+ const totalInterest=money(rows.reduce((v,r)=>v+r.interest,0));
+ return {mode,amount,deposit,borrowed,term,annualRatePercent:annualRate*100,buyout,rows,totalInterest,
+  totalPayments:money(rows.reduce((v,r)=>v+r.payment+r.buyout,0)),
+  // En leasing, l'actif n'est pas acquis comptablement dans ce modèle simplifié.
+  upfrontCash:money(purchase-borrowed),
+  payer:settings.payer||'Backlight',
+  warning:requested>purchase?'Montant financé plafonné aux achats de matériel connus.':''};
+}
+export function monthlyCashFlow(model,traffic,staff,capex,deployment,finance){
+ const financing=model.finance?.funding||{};
+ const operationMonths=traffic.monthly.map(x=>x.month);
+ const startMonth=financing.startMonth||operationMonths[0]||(model.locations||[]).map(x=>x.startDate?.slice(0,7)).filter(Boolean).sort()[0]||'2026-01';
+ const plan=financingSchedule(capex,financing,startMonth);
+ const allMonths=[...operationMonths,...plan.rows.map(x=>x.month),startMonth];
+ let first=allMonths.sort()[0],last=allMonths.at(-1);
+ const maxPeriods=Math.min(240,(Number(last.slice(0,4))-Number(first.slice(0,4)))*12+Number(last.slice(5))-Number(first.slice(5))+1);
+ const monthData=Object.fromEntries(traffic.monthly.map(x=>[x.month,x]));
+ const totalDays=Math.max(1,traffic.monthly.reduce((n,x)=>n+x.openDays,0));
+ const monthsOpen=Math.max(1,operationMonths.length);
+ const operationStart=operationMonths[0]||startMonth;
+ const operationEnd=operationMonths.at(-1)||startMonth;
+ const feeModel=model.finance||{};
+ const tax=Math.max(0,num(model.settings?.vat,.2));
+ let balance=money(num(financing.openingCash,0));
+ const rows=[];
+ for(let i=0;i<maxPeriods;i++){
+  const month=addMonth(first,i),t=monthData[month],days=t?.openDays||0;
+  const gross=t?.gross||0,visitors=t?.visitors||0,played=t?.played||0;
+  const ticketsHT=gross/(1+tax);
+  const ancillary=(feeModel.ancillary||[]).reduce((v,x)=>v+num(x.amount)*(x.frequency==='monthly'&&days>0?1:x.frequency==='once'&&month===operationStart?1:0),0);
+  const income=money(ticketsHT+ancillary);
+  const opex=(feeModel.opex||[]).reduce((v,x)=>v+num(x.amount)*(x.frequency==='daily'?days:x.frequency==='weekly'?days/7:x.frequency==='monthly'&&days>0?1:x.frequency==='once'&&month===operationStart?1:0),0);
+  const staffOut=staff.cost*days/totalDays;
+  const variable=visitors*num(feeModel.variablePerVisitor)+played*num(feeModel.variablePerSession)+ticketsHT*num(feeModel.variableRate);
+  const ticketing=feeModel.feeMode==='none'?0:visitors*num(feeModel.feeFixed)+ticketsHT*num(feeModel.feeRate);
+  const deploymentOut=deployment.items.reduce((v,x)=>v+(x.phase==='before'&&month===operationStart||x.phase==='after'&&month===operationEnd||x.phase==='during'&&days>0?x.cost*(x.phase==='during'?days/totalDays:1):0),0);
+  const assetOut=month===startMonth?plan.upfrontCash:0;
+  const scheduled=plan.rows.find(r=>r.month===month);
+  const debtService=(scheduled?.payment||0)+(scheduled?.buyout||0);
+  const expense=money(opex+staffOut+variable+ticketing+deploymentOut+assetOut+debtService);
+  const net=money(income-expense);balance=money(balance+net);
+  rows.push({month,income,opex:money(opex),staff:money(staffOut),variable:money(variable),ticketing:money(ticketing),deployment:money(deploymentOut),investment:money(assetOut),payment:scheduled?.payment||0,interest:scheduled?.interest||0,buyout:scheduled?.buyout||0,outflow:expense,net,balance});
+ }
+ return {plan,rows,openingCash:money(num(financing.openingCash,0)),endingCash:balance,minCash:Math.min(money(num(financing.openingCash,0)),...rows.map(r=>r.balance)),
+  totalInflows:money(rows.reduce((v,r)=>v+r.income,0)),totalOutflows:money(rows.reduce((v,r)=>v+r.outflow,0)),
+  warning:'Projection simplifiée HT : TVA encaissée/décaissée, décalages de paiement, amortissements, fiscalité et contrats partenaires non modélisés.'};
+}
+export function fullForecast(model,catalog=[]){const traffic=forecastTraffic(model);const staff=staffCost(model);const capex=estimateCapex(model,catalog);const deployment=calculateDeployment(model);const finance=revenuesAndProfit(model,traffic,staff,capex,deployment);const cashFlow=monthlyCashFlow(model,traffic,staff,capex,deployment,finance);return {traffic,staff,capex,deployment,finance,cashFlow,computedAt:new Date().toISOString()}}
 export function compare(models,catalog){return models.map(m=>({name:m.name,...fullForecast(m,catalog)}))}

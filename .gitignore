@@ -1,5 +1,12 @@
 node_modules/
-data/state.json
-data/backups/
+# Production data is confidential. Only approved fixtures are versioned.
+data/*
+!data/catalog.json
+!data/state.example.json
+.env
+.env.*
+!*.example
 *.log
+*.zip
 .DS_Store
+__pycache__/
