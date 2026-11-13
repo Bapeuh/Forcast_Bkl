@@ -1,3 +1,4 @@
+import {installationRequirement} from './setup-compatibility.mjs';
 // Moteurs purs : aucune dépendance au serveur, à l'interface ou au stockage.
 export const num=(v,d=0)=>(v===null||v===undefined||v==='')?d:(Number.isFinite(Number(v))?Number(v):d);
 export const ceil=v=>Math.ceil(Math.max(0,num(v)));
@@ -123,6 +124,7 @@ export function estimateCapex(model,catalog=[]){
   servers+=copies; // Un PC serveur pour chaque setup, y compris Standalone.
   const catalogHeadset=catalog.find(x=>x.category==='Casque VR'&&x.name.toLowerCase().includes((setup.headsetModel||'').toLowerCase()));
   push(setup.headsetModel||'Casque VR',headsets,catalogHeadset?.price??null,'Casque VR','1 casque par place',catalogHeadset?.id);
+  raw[raw.length-1].installedQty=installationRequirement(setup).installed;
   const pico=/pico 4 ultra/i.test(setup.headsetModel||'');
   const combo=pico?find('Strap + 2 Batteries + Dock'):null;
   if(combo){
@@ -170,7 +172,8 @@ export function estimateCapex(model,catalog=[]){
   const qty=Math.max(0,Math.floor(num(ov.qty,x.qty)));
   const excluded=Boolean(ov.excluded);
   const kept=excluded?0:qty;
-  const stockQty=Math.min(kept,Math.max(0,Math.floor(num(ov.stockQty,0))));
+  const autoInstalled=raw.filter(y=>y.category==='Casque VR'&&y.id===x.id&&y.name===x.name).reduce((acc,y)=>acc+(y.installedQty||0),0);
+  const stockQty=Math.min(kept,Math.max(0,Math.floor(num(ov.stockQty,autoInstalled))));
   const rentQty=Math.min(kept-stockQty,Math.max(0,Math.floor(num(ov.rentQty,0))));
   const buyQty=kept-stockQty-rentQty;
   const unitCost=ov.unitCost===null?null:num(ov.unitCost,x.unitCost);
@@ -185,7 +188,8 @@ export function estimateCapex(model,catalog=[]){
   const total=purchaseTotal===null||rentalTotal===null?null:money(purchaseTotal+stockUseTotal+rentalTotal);
   const m=Math.min(.95,Math.max(0,num(ov.margin,margin)));
   const sale=total===null?null:ov.sale!=null?num(ov.sale):money(total/(1-m));
-  return {...x,qty:kept,unitCost,originalQty:x.qty,excluded,buyQty,stockQty,rentQty,stockUnitCost,stockUseTotal,rentalUnitCost,rentalMonths,rentalTotal,purchaseTotal,total,margin:m,sale};
+  const installedQty=Math.min(stockQty,Math.max(0,Math.floor(num(ov.installedQty,autoInstalled))));
+  return {...x,qty:kept,unitCost,originalQty:x.qty,excluded,buyQty,stockQty,installedQty,rentQty,stockUnitCost,stockUseTotal,rentalUnitCost,rentalMonths,rentalTotal,purchaseTotal,total,margin:m,sale};
  });
  const missing=items.filter(x=>(x.buyQty>0&&x.unitCost===null)||(x.rentQty>0&&x.rentalUnitCost===null));
  const purchase=money(items.reduce((s,x)=>s+num(x.purchaseTotal),0));

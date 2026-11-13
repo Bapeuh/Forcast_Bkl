@@ -45,6 +45,7 @@ const server=http.createServer(async(req,res)=>{
   if(url.pathname==='/core/revenue-routes.mjs'){res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8','Cache-Control':'no-cache'});return fs.createReadStream(path.join(DIR,'core','revenue-routes.mjs')).pipe(res)}
   if(url.pathname==='/core/partners.mjs'){res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8','Cache-Control':'no-cache'});return fs.createReadStream(path.join(DIR,'core','partners.mjs')).pipe(res)}
   if(url.pathname==='/core/forecast.mjs'){res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8','Cache-Control':'no-cache'});return fs.createReadStream(path.join(DIR,'core','forecast.mjs')).pipe(res)}
+  if(['/core/quote-details.mjs','/core/setup-compatibility.mjs','/core/document-templates.mjs'].includes(url.pathname)){res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8','Cache-Control':'no-cache'});return fs.createReadStream(path.join(DIR,'core',path.basename(url.pathname))).pipe(res)}
   const requested=path.normalize(decodeURIComponent(url.pathname==='/'?'/index.html':url.pathname));
   const target=path.resolve(PUBLIC,'.'+requested);if(!target.startsWith(PUBLIC+path.sep))return respond(res,403,{error:'Accès refusé'});
   if(!fs.existsSync(target)||!fs.statSync(target).isFile())return respond(res,404,{error:'Introuvable'});
