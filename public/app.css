@@ -67,9 +67,9 @@
 
 /* V2.1.1 – Editeur imprimable par blocs. Le document et le PDF partagent le rendu. */
 .quote-a4{box-sizing:border-box;width:100%;max-width:794px;min-height:900px;padding:32px;background:#fff;color:#1e293b;border:1px solid #d2d9e6;box-shadow:0 4px 14px #14233c14;margin:0 auto;font-family:Arial,sans-serif;font-size:12px}
-.quote-block-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--quote-spacing,16px);align-items:start}
+.quote-block-grid{display:grid;grid-template-columns:repeat(var(--quote-columns,6),minmax(0,1fr));gap:var(--quote-spacing,16px);align-items:start}
 .quote-block{box-sizing:border-box;min-width:0;overflow-wrap:anywhere;break-inside:avoid;padding:7px 9px}
-.quote-width-2{grid-column:span 2}.quote-width-1{grid-column:span 1}
+
 .quote-block h3{font-size:18px;margin:4px 0}.quote-block h4{font-size:12px;margin:0 0 7px;padding-bottom:6px;border-bottom:1px solid #d7dee9}
 .quote-block p{margin:6px 0;white-space:pre-line;line-height:1.5}.quote-block small{color:#66758b;display:block;font-size:10px;letter-spacing:.04em}.quote-block strong{display:block}
 .quote-logo-img{max-width:100%;max-height:100px;object-fit:contain;object-position:left top}
@@ -90,3 +90,43 @@
 .mission-template-manager{border:1px solid #bdcbea;background:#f6f9ff;border-radius:12px;padding:16px;margin:14px 0}.mission-template-manager .mission{background:white}
 
 .quote-print-table .quote-sector-title td{background:#edf2fa;color:#234477;font-weight:800;font-size:12px;letter-spacing:.3px;padding:9px 12px;border-top:1px solid #d7e1ef}
+
+/* L01 — 6 column editor / commercial detail */
+.quote-child td{background:#f8faff;font-size:10px;padding:4px 6px!important}.quote-child td:first-child{padding-left:20px!important}
+.quote-detail-warning td{font-size:9px;background:#fff8e5;color:#855615}.quote-detail-editor td{background:#f5f7fc;text-align:left!important;padding:8px!important}
+.quote-child-editor{display:flex;gap:8px;align-items:end;flex-wrap:wrap;padding:7px;border-bottom:1px solid #dfe5ef}.quote-child-editor .field{flex:1;min-width:100px}.quote-child-editor input[type=number]{width:100%}
+.quote-compact{font-size:10px}.quote-compact .quote-block{padding:3px 5px}.quote-compact .quote-block-grid{gap:8px}.quote-compact .quote-print-table td{padding:5px}
+@media print{.quote-block-grid{grid-template-columns:repeat(var(--quote-columns,6),minmax(0,1fr))}.quote-print-table tr{break-inside:avoid;page-break-inside:avoid}}
+
+/* L01 UX — défilement indépendant de la navigation latérale et du contenu. */
+@media screen and (min-width:761px){
+  html,body{height:100%;overflow:hidden}
+  .shell{height:100dvh;min-height:0;overflow:hidden}
+  .sidebar{height:100dvh;min-height:0;position:relative;top:auto;overflow:hidden}
+  .sidebar #nav{display:flex;flex-direction:column;gap:4px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#637894 #101c2d}
+  .sidebar #nav button{flex-shrink:0}
+  .sidebar .brand,.sidebar .project-switcher,.sidebar .asideLabel,.sidebar .aside-bottom{flex-shrink:0}
+  .main{height:100dvh;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+}
+/* Sur mobile, conserver le défilement naturel et la navigation horizontale existante. */
+@media screen and (max-width:760px){
+  html,body{height:auto;overflow-x:hidden;overflow-y:auto}
+  .shell{height:auto;min-height:100vh;overflow:visible}
+  .sidebar{height:auto;overflow:visible}
+  .sidebar #nav{overflow-x:auto;overflow-y:hidden;flex-direction:row}
+  .main{height:auto;overflow:visible}
+}
+@media print{
+  html,body{height:auto!important;overflow:visible!important}
+  .shell,.main{height:auto!important;min-height:0!important;overflow:visible!important}
+}
+
+/* L01 feedback: explicitly controlled, independently reorderable quote columns */
+.quote-column-control{min-width:240px;grid-column:1/-1;background:#f8fafc;border:1px solid #d9e2ef;border-radius:8px;padding:12px}
+.quote-column-list{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.quote-column-item{display:flex;align-items:center;gap:6px;border:1px solid #cbd5e1;padding:5px 8px;border-radius:7px;background:#fff}
+.quote-column-item[draggable=true]{cursor:grab}
+.quote-column-item label{display:flex;align-items:center;gap:6px;white-space:nowrap;margin:0}
+.quote-column-handle{color:#64748b}
+.quote-column-hidden{display:flex;flex-wrap:wrap;gap:12px}
+.quote-column-hidden label{display:flex;align-items:center;gap:6px}

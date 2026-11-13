@@ -22,7 +22,7 @@ test('l’espace rectangulaire est validé avec rotation possible, pas par simpl
   assert.equal(match(exp,{playWidthM:0,playDepthM:0}),null);
 });
 test('compatibilité conservatrice : options incompatibles filtrées sauf affichage volontaire',()=>{
-  assert.ok(source.includes('showAllXps||areaMatch(x,item)!==false'));
+  assert.ok(source.includes('showAllXps||setupExperienceFit(x,item).compatible'));
   assert.ok(source.includes('Incompatible'));
   assert.ok(source.includes('Dimensions à vérifier'));
 });

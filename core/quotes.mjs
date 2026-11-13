@@ -1,11 +1,53 @@
+import {rowSale,detailDisclosure} from './quote-details.mjs';
 // Portable quote domain. No browser or persistence dependencies.
 export const quoteCategories=['Matériel','Licences','Prestations techniques','Formation','Logistique','Maintenance','Production','Autres'];
 const n=x=>Number.isFinite(Number(x))?Number(x):0;
 const amount=x=>Math.round((x+Number.EPSILON)*100)/100;
+/** Assemble des sous-lignes commerciales à partir des ressources d'une mission.
+ * Les coûts internes ne quittent jamais le calcul : seules quantités et prix de vente alloués sont exposés.
+ * Le dernier poste est ajusté au centime pour rester égal au forfait vendu. */
+export function missionQuoteChildren(mission, sale, id=()=>crypto.randomUUID()) {
+ const v=x=>Math.max(0,Number(x)||0), values=[];
+ const put=(name,qty,cost,unitLabel='')=>{if(qty>0&&cost>0)values.push({description:name,quantity:qty,cost,unitLabel});};
+ const jh=v(mission.technicians)*v(mission.days);
+ put('Techniciens VR',jh,jh*v(mission.hoursPerDay)*v(mission.hourlyCost),'J/H');
+ put('Préparation technique',v(mission.preparationHours),v(mission.preparationHours)*v(mission.preparationHourlyCost),'h');
+ put('Hébergement',v(mission.travelers)*v(mission.nights),v(mission.travelers)*v(mission.nights)*v(mission.hotelPerNight),'nuit');
+ put('Repas',v(mission.travelers)*v(mission.mealDays),v(mission.travelers)*v(mission.mealDays)*v(mission.mealPerDay),'repas');
+ put('Transport et logistique',1,v(mission.travelers)*v(mission.transportPerPerson)+v(mission.localTransport)+v(mission.freight)+v(mission.customs)+v(mission.insurance)+v(mission.otherCost),'forfait');
+ if(!values.length||!Number.isFinite(sale)||sale<=0)return [];
+ const costSum=values.reduce((a,x)=>a+x.cost,0);
+ let allocated=0;
+ return values.map((x,i)=>{
+  const value=i===values.length-1?amount(sale-allocated):amount(sale*x.cost/costSum);
+  allocated+=value;
+  // Keep quantities in their native unit (not merely informational). Precision at
+  // 6 decimals prevents nearly all rounding drift; any residual is disclosed by detailDisclosure.
+  return {id:id(),description:x.description,quantity:x.quantity,unit:Number((value/x.quantity).toFixed(6)),unitLabel:x.unitLabel,visible:true,workload:x.quantity,workloadUnit:x.unitLabel};
+ });
+}
 export function seedQuote(project,capex,deployment,id=()=>crypto.randomUUID()){
  const rows=[];
- for(const x of capex.items||[]){if(!(x.qty>0))continue;rows.push({id:id(),source:`material:${x.id}`,category:'Matériel',description:x.name,quantity:x.qty,unit:x.sale==null?null:amount(x.sale/x.qty),cost:x.total??null,enabled:true});}
- for(const [index,x] of (deployment.items||[]).entries()){if(!(x.sale>0))continue;rows.push({id:id(),source:`mission:${index}`,category:x.sector|| (x.name.toLowerCase().match(/transport|voyage|hôtel|logistique|fret|douane/)?'Logistique':x.name.toLowerCase().match(/formation/)?'Formation':'Prestations techniques'),description:x.name,quantity:1,unit:amount(x.sale),cost:x.cost??null,enabled:true});}
+ for(const x of capex.items||[]){
+  if(!(x.qty>0))continue;
+  const partitions=[['buy',x.buyQty??x.qty,x.purchaseTotal??x.total??0,'Achat'],['rent',x.rentQty??0,x.rentalTotal??0,'Location'],['stock',x.stockQty??0,x.stockUseTotal??0,'Mise à disposition']].filter(([,,v])=>Number(v)>0);
+  // An older CAPEX object may only provide a single sale value: keep it as one line.
+  const totalCost=partitions.reduce((s,p)=>s+Number(p[2]),0);
+  if(!partitions.length){if(x.sale===0)continue;rows.push({id:id(),source:`material:${x.id}`,category:'Matériel',description:x.name,quantity:x.qty,unit:x.sale==null?null:amount(x.sale/x.qty),cost:x.total??null,enabled:true});continue;}
+  let remaining=x.sale==null?null:amount(x.sale),acc=0;
+  for(const [j,[kind,qty,cost,label]] of partitions.entries()){
+   const last=j===partitions.length-1;
+   const value=remaining===null?null:last?amount(remaining-acc):amount(remaining*Number(cost)/totalCost);
+   if(value!==null)acc+=value;
+   rows.push({id:id(),source:`material:${x.id}:${kind}`,category:'Matériel',description:x.name+(kind==='buy'?'':` — ${label}`),quantity:qty,unit:value===null?null:Number((value/qty).toFixed(6)),cost:cost??null,material:{buyQty:x.buyQty??x.qty,stockQty:x.stockQty??0,installedQty:x.installedQty??0,rentQty:x.rentQty??0,kind},enabled:true});
+  }
+ }
+ for(const [index,x] of (deployment.items||[]).entries()){
+  if(!(x.sale>0))continue;
+  const mission=(project.deployment?.missions||[]).find(m=>(m.id||m.name)===x.id);
+  const children=mission?missionQuoteChildren(mission,amount(x.sale),id):[];
+  rows.push({id:id(),source:`mission:${index}`,category:x.sector|| (x.name.toLowerCase().match(/transport|voyage|hôtel|logistique|fret|douane/)?'Logistique':x.name.toLowerCase().match(/formation/)?'Formation':'Prestations techniques'),description:x.name,quantity:1,unit:amount(x.sale),cost:x.cost??null,enabled:true,children,childrenSource:children.length?'deployment':undefined,displayMode:'summary',pricingMode:'fixed'});
+ }
  const today=new Date().toISOString().slice(0,10);
  return {id:id(),number:'DEV-'+today.slice(0,4)+'-001',version:1,status:'Brouillon',date:today,validUntil:'',client:'',clientAddress:'',clientContact:'',projectName:project.name||'',title:'Proposition commerciale — '+(project.name||'Projet'),vat:n(project.settings?.vat??.2)*100,discount:0,conditions:'40 % à la commande · 30 % à mi-parcours · 30 % à la livraison',notes:'Prix et disponibilités à confirmer avant acceptation.',company:{name:'BACKLIGHT STUDIO',address:'Coordonnées à confirmer',email:'',vat:'',bank:''},rows};
 }
@@ -23,7 +65,7 @@ export function sortedQuoteRows(quote){
  }).map(x=>x.row);
 }
 export function totals(quote){
- const lines=sortedQuoteRows(quote).map(x=>({...x,lineTotal:x.unit==null?null:amount(n(x.quantity)*n(x.unit))}));
+ const lines=sortedQuoteRows(quote).map(x=>({...x,lineTotal:rowSale(x)}));
  const incomplete=lines.filter(x=>x.lineTotal===null);const subtotal=amount(lines.reduce((s,x)=>s+n(x.lineTotal),0));const discount=amount(subtotal*n(quote.discount)/100);const totalHT=amount(subtotal-discount);const vat=amount(totalHT*n(quote.vat)/100);
  return {lines,incomplete,subtotal,discount,totalHT,vat,totalTTC:amount(totalHT+vat),cost:amount(lines.reduce((s,x)=>s+n(x.cost),0))};
 }

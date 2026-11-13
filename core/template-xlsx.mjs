@@ -1,3 +1,4 @@
+import {detailDisclosure} from './quote-details.mjs';
 // Export XLSX based on the historic Backlight workbook. No external packages.
 // Preserve its original fonts, merged areas, logo, borders, footer and page setup.
 import fs from 'node:fs';
@@ -19,7 +20,7 @@ function replaceCell(row,col,num,{style,text,value,formula}){const reference=`${
  return old?row.replace(old,cell):row.replace('</row>',cell+'</row>');}
 function parseRow(row,i){return row.replace(/(<row\b[^>]*\br=")\d+(?=")/,'$1'+i).replace(/(<c\b[^>]*\br="[A-Z]+)\d+(?=")/g,'$1'+i);}
 function dateNumber(dateString){const ms=Date.parse(dateString+'T00:00:00Z');return Number.isFinite(ms)?Math.floor(ms/86400000)+25569:null;}
-function modifySheet(xml,q){const t=totals(q);const lines=t.lines;if(lines.length>85)throw new Error('Devis trop long pour le modèle A4 : 85 lignes maximum. Utilisez le PDF multipage.');
+function modifySheet(xml,q){const t=totals(q);const lines=t.lines.flatMap(x=>{const d=detailDisclosure(x);return [x,...d.children.map(c=>({category:'',description:'    ↳ '+c.description+(c.unitLabel?' ('+c.unitLabel+')':''),quantity:c.quantity,unit:c.showPrice?c.unit:null,lineTotal:c.showPrice?Math.round(c.quantity*c.unit*100)/100:null}))];});if(lines.length>85)throw new Error('Devis trop long pour le modèle A4 : 85 lignes maximum. Utilisez le PDF multipage.');
  // The original template reserves rows 19..25 for items; grow this area, preserving the original end sections.
  const shift=Math.max(0,lines.length-7);const start=19;let original=xml;
  let rows=[...original.matchAll(/<row\b[^>]*\br="(\d+)"[^>]*>[^]*?<\/row>/g)].map(m=>({n:+m[1],text:m[0]}));const prototype=rows.find(x=>x.n===19).text;
